@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+rich
+pypdf
+unstructured[local-inference]
+chardet
+numpy
+faiss-cpu
+sentence-transformers
+google-generativeai
+python-dotenv

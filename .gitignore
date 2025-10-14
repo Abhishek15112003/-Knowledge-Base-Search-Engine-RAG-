@@ -1,0 +1,55 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Environment variables
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Data directories (optional - remove if you want to include sample data)
+backend/data/raw/*
+backend/data/processed/*
+backend/data/uploaded/*
+backend/data/index/*
+
+# Keep directory structure but ignore contents
+!backend/data/raw/.gitkeep
+!backend/data/processed/.gitkeep
+!backend/data/uploaded/.gitkeep
+!backend/data/index/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db

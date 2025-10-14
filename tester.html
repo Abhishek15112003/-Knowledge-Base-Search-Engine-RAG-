@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Upload & Ask</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --b:#111; --bd:#ddd; --muted:#666; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 2rem; }
+    h1 { margin: 0 0 1rem; }
+    .card { border: 1px solid var(--bd); border-radius: 12px; padding: 1rem; margin-top: 1rem; }
+    .row { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+    input[type="text"], textarea { width: 100%; max-width: 640px; padding: .6rem .8rem; border-radius: 10px; border:1px solid var(--bd); }
+    textarea { min-height: 92px; }
+    button { padding: .6rem 1rem; border-radius: 999px; border:1px solid var(--bd); background:#111; color:#fff; cursor:pointer; }
+    .muted { color: var(--muted); font-size: .9rem; }
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+  <h1>Upload & Ask</h1>
+
+  <div class="card">
+    <div class="row">
+      <label for="api">API URL</label>
+      <input id="api" type="text" value="http://localhost:8000" />
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <input id="file" type="file" accept=".pdf,.txt" />
+      <button id="btnUpload">Upload</button>
+    </div>
+    <div id="uploadOut" class="muted"></div>
+    <!-- keep session id but hide it; used by /ask -->
+    <input id="sid" type="text" class="hidden" />
+  </div>
+
+  <div class="card">
+    <div class="row" style="width:100%;">
+      <textarea id="q" placeholder="Ask a question about the uploaded file… (e.g., refund policy, password reset)"></textarea>
+    </div>
+    <div class="row">
+      <button id="btnAsk">Ask</button>
+    </div>
+    <div id="askOut"></div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function setHTML(el, html) { el.innerHTML = html; }
+    function escapeHTML(s){
+      return (s || "").replace(/[&<>"']/g, c => (
+        {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+      ));
+    }
+
+    async function upload() {
+      const base = $("api").value.trim();
+      const f = $("file").files[0];
+      if (!f) { alert("Pick a .pdf or .txt file first."); return; }
+
+      setHTML($("uploadOut"), "Uploading…");
+      $("btnUpload").disabled = true;
+
+      try {
+        const fd = new FormData();
+        fd.append("file", f);
+        const res = await fetch(`${base}/upload`, { method: "POST", body: fd });
+        const text = await res.text();
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}: ${text}`);
+
+        const data = JSON.parse(text);
+        $("sid").value = data.session_id || "";
+        setHTML($("uploadOut"), `Ready. File: <b>${escapeHTML(data.filename || f.name)}</b>`);
+      } catch (e) {
+        setHTML($("uploadOut"), escapeHTML(String(e)));
+      } finally {
+        $("btnUpload").disabled = false;
+      }
+    }
+
+    function renderResult(result) {
+      const { answer, citations, filename } = result || {};
+      const src = (Array.isArray(citations) && citations.length)
+        ? `<div class="muted">Source: ${escapeHTML(filename || citations[0]?.source || "(unknown)")}</div>`
+        : "";
+      return `
+        <div class="card" style="margin-top:.75rem">
+          <div style="white-space:pre-wrap">${escapeHTML(answer || "(no answer)")}</div>
+          ${src}
+        </div>
+      `;
+    }
+
+    async function ask() {
+      const base = $("api").value.trim();
+      const sid = $("sid").value.trim();
+      const q = $("q").value.trim();
+      if (!sid) { alert("Upload a file first."); return; }
+      if (!q) { alert("Ask a question."); return; }
+
+      setHTML($("askOut"), "Thinking…");
+      $("btnAsk").disabled = true;
+
+      try {
+        const res = await fetch(`${base}/ask`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ session_id: sid, q, k: 6, strict: true })
+        });
+        const text = await res.text();
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}: ${text}`);
+        const data = JSON.parse(text);
+        setHTML($("askOut"), renderResult(data));
+      } catch (e) {
+        setHTML($("askOut"), escapeHTML(String(e)));
+      } finally {
+        $("btnAsk").disabled = false;
+      }
+    }
+
+    $("btnUpload").addEventListener("click", upload);
+    $("btnAsk").addEventListener("click", ask);
+  </script>
+</body>
+</html>
