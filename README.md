@@ -4,6 +4,7 @@
 
 A sophisticated Retrieval-Augmented Generation (RAG) system that allows users to upload documents and ask questions with intelligent, grounded responses powered by Google's Gemini AI and advanced text processing techniques.A compact Retrieval-Augmented Generation (RAG) system that lets you **upload a PDF/TXT** and **ask questions**. Answers are **strictly grounded** in the uploaded content and synthesized by **Google Gemini** with citations.
 
+### Demo Video ([Get one here](https://drive.google.com/file/d/1XObPk4au5JGN_Cu4cuL_qh9l3LgBoGgq/view?usp=sharing))
 
 
 
@@ -93,7 +94,8 @@ A sophisticated Retrieval-Augmented Generation (RAG) system that allows users to
 
 - Python 3.8+ (developed with Python 3.13)
 
-- Google Gemini API key ([Get one here](https://makersuite.google.com/app/apikey))### 1) Create & activate a virtual environment
+- Google Gemini API key ([Get one here](https://makersuite.google.com/app/apikey))
+### 1) Create & activate a virtual environment
 
 ```bash
 
