@@ -208,4 +208,4 @@ The API will be available at `http://localhost:8000`
 
 ---
 
-**Ready to get started?** Upload a document via `tester.html` and ask your first question! 🚀
+**Ready to get started?** Upload a document via `tester.html` and ask your first question! 
