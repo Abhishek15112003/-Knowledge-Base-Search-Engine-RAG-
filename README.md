@@ -1,561 +1,437 @@
-# Knowledge RAG API# Knowledge RAG API 
+# Knowledge RAG API# Knowledge RAG API
 
 
 
-A sophisticated Retrieval-Augmented Generation (RAG) system that allows users to upload documents and ask questions with intelligent, grounded responses powered by Google's Gemini AI and advanced text processing techniques.# 1) Create and activate a virtual environment
+A sophisticated Retrieval-Augmented Generation (RAG) system that allows users to upload documents and ask questions with intelligent, grounded responses powered by Google's Gemini AI and advanced text processing techniques.A compact Retrieval-Augmented Generation (RAG) system that lets you **upload a PDF/TXT** and **ask questions**. Answers are **strictly grounded** in the uploaded content and synthesized by **Google Gemini** with citations.
 
 
 
-## FeaturesA sophisticated Retrieval-Augmented Generation (RAG) system that allows users to upload documents and ask questions with intelligent, grounded responses powered by Google's Gemini AI and advanced text processing techniques.python -m venv .venv
+## Features---
 
 
 
-### Core Functionality# Windows: .venv\\Scripts\\activate
+### Core Functionality## Features
 
-- **Document Upload**: Support for PDF and TXT file uploads
 
-- **Intelligent Q&A**: Ask questions about uploaded documents with contextual answers
-- ##  Features# Linux/Mac: source .venv/bin/activate
 
-- **Dual RAG Architecture**: 
+- **Document Upload**: Support for PDF and TXT file uploads- **Upload & Ask**: `POST /upload` → `POST /ask`
 
-  - Single-document TF-IDF + Gemini for focused queries
+- **Intelligent Q&A**: Ask questions about uploaded documents with contextual answers- **Strict grounding**: answers only from provided context; otherwise _“I don’t know based on the provided document.”_
 
-  - Multi-document FAISS + Sentence Transformers for complex retrieval
+- **Strict Grounding**: All answers are 1-4 sentences with required citations [1], [2]- **Smart query enhancement**: n-gram TF-IDF, typo/fuzzy handling, and synonym expansion for short queries
 
-- **Strict Grounding**: Ensures all answers are backed by document content with citations### Core Functionality
+- **Session Management**: Per-upload session isolation for document queries- **Minimal UI**: `backend/static/tester.html` (served at `/`)
 
-- **Smart Query Enhancement**: Handles typos, short queries, and synonym expansion
+- **Smart Query Enhancement**: Handles typos, short queries, and synonym expansion- **Health monitoring**: `GET /healthz`
 
-- **Document Upload**: Support for PDF and TXT file uploads# 2) Install dependencies
+- **Optional multi-doc RAG**: FAISS index + MMR reranker + retrieval eval
 
 ### Advanced Features
 
-- **Fuzzy Matching**: Automatic typo correction and query enhancement- **Intelligent Q&A**: Ask questions about uploaded documents with contextual answerspip install -r requirements.txt
+---
 
-- **N-gram TF-IDF**: Enhanced text matching with 1-3 word phrases
+- **Compact Context**: Limited to 4 blocks and 1600 characters for precise answers
 
-- **Citation System**: All answers include numbered citations `[1]`, `[2]` referencing source blocks- **Dual RAG Architecture**: 
+- **Citation Requirements**: Every sentence must include [n] citations## Project Structure
 
-- **Session Management**: Per-upload session isolation for document queries
+- **Fuzzy Matching**: Automatic typo correction and query enhancement
 
-- **Summary Generation**: Can provide document summaries and content overviews  - Single-document TF-IDF + Gemini for focused queries
+- **N-gram TF-IDF**: Enhanced text matching with 1-2 word phrasesAssignment/
 
-- **Health Monitoring**: Built-in health checks and debug endpoints
+- **Strict Validation**: Ensures all answers are grounded in document content├── backend/ # Backend API and core logic
 
-  - Multi-document FAISS + Sentence Transformers for complex retrieval# 3) Configure env
+- **Health Monitoring**: Built-in health checks and debug endpoints│ ├── app.py # FastAPI app: /healthz, /upload, /ask (+ optional /query)
 
-## Project Structure
+│ ├── rag_pipeline.py # (optional) Multi-doc FAISS RAG pipeline
 
-- **Strict Grounding**: Ensures all answers are backed by document content with citationscp .env.example .env
+## Project Structure│ ├── rerank.py # (optional) MMR reranker (multi-doc)
 
-```
+│ ├── settings.py # Configuration
 
-d:/Assignment/- **Smart Query Enhancement**: Handles typos, short queries, and synonym expansion
+```│ ├── init.py # Package init
 
-├── backend/                     # Backend API and core logic
+-Knowledge-Base-Search-Engine-RAG-/│ └── data/ # (optional) Multi-doc data dirs
 
-│   ├── app.py                  # Main FastAPI application
+├── backend/                     # Backend API and core logic│ ├── raw/ # Raw files for multi-doc ingest
 
-│   ├── rag_pipeline.py         # Multi-document FAISS RAG pipeline
+│   ├── app.py                  # Main FastAPI application│ ├── processed/ # Ingested chunks.jsonl
 
-│   ├── settings.py             # Configuration settings### Advanced Features# 4) Run the API
+│   ├── rag_pipeline.py         # Multi-document FAISS RAG pipeline│ ├── uploaded/ # Per-session uploads (if persisted)
 
-│   ├── __init__.py             # Package initialization
+│   ├── settings.py             # Configuration settings│ └── index/ # Vector indices / meta
 
-│   └── data/                   # Data storage directories- **Fuzzy Matching**: Automatic typo correction and query enhancementuvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
+│   ├── __init__.py             # Package initialization├── backend/static/
 
-│       ├── raw/                # Raw uploaded files- **N-gram TF-IDF**: Enhanced text matching with 1-3 word phrases
+│   └── data/                   # Data storage directories│ └── tester.html # Minimal web tester (served at /)
 
-│       ├── processed/          # Processed document chunks- **Citation System**: All answers include numbered citations `[1]`, `[2]` referencing source blocks
+│       ├── raw/                # Raw uploaded files├── requirements.txt # Python dependencies
 
-│       ├── uploaded/           # Session-based uploads- **Session Management**: Per-upload session isolation for document queries
+│       ├── processed/          # Processed document chunks├── .env.example # Environment template
 
-│       └── index/              # Vector indices- **Summary Generation**: Can provide document summaries and content overviews
+│       ├── uploaded/           # Session-based uploads├── .gitignore
 
-├── tester.html                 # Web-based testing interface- **Health Monitoring**: Built-in health checks and debug endpoints
+│       └── index/              # Vector indices└── README.md
 
-├── requirements.txt            # Python dependencies
-
-├── .env.example                # Environment configuration template## Project Structure
-
-├── .gitignore                  # Git exclusions
-
-└── README.md                   # This documentation```
-
-d:/Assignment/
-
-├── backend/                     # Backend API and core logic
-
-## Installation & Setup│
-├── app.py                  # Main FastAPI application
-
-│   ├── rag_pipeline.py         # Multi-document FAISS RAG pipeline
-
-### Prerequisites│
-├── settings.py             # Configuration settings
-
-- Python 3.8+ (developed with Python 3.13)│
-├── __init__.py             # Package initialization
-
-- Google Gemini API key│
-└── data/                   # Data storage directories
-
-│       ├── raw/                # Raw uploaded files
-
-### 1. Clone and Navigate│
-├── processed/          # Processed document chunks
-
-
-├── uploaded/           # Session-based uploads
-
-git clone <repository-url>│
-└── index/              # Vector indices
-
-cd Assignment
 ├── tester.html                 # Web-based testing interface
 
-├── requirements.txt            # Python dependencies
+├── requirements.txt            # Python dependenciesyaml
 
-├── .env.example                # Environment configuration template
+├── .env.example                # Environment configuration templateCopy code
 
-### 2. Install Dependencies
 ├── .gitignore                  # Git exclusions
 
-└── README.md                   # This documentation
-
-pip install -r requirements.txt```
+└── README.md                   # This documentation---
 
 ```
 
 ## 🔧 Installation & Setup
 
-### 3. Environment Configuration
+## Installation & Setup
 
-Create or update `.env` file:### Prerequisites
+### Prerequisites
 
-```env- Python 3.8+ (developed with Python 3.13)
+### Prerequisites- Python **3.11+** (tested on 3.11/3.13)
 
-APP_NAME="Knowledge RAG API"- Google Gemini API key
+- Google **Gemini** API key
+
+- Python 3.8+ (developed with Python 3.13)
+
+- Google Gemini API key ([Get one here](https://makersuite.google.com/app/apikey))### 1) Create & activate a virtual environment
+
+```bash
+
+### 1. Clone and Navigatepython -m venv .venv
+
+# Windows
+
+```bash.\.venv\Scripts\activate
+
+git clone https://github.com/Abhishek15112003/-Knowledge-Base-Search-Engine-RAG-.git# Linux/Mac
+
+cd -Knowledge-Base-Search-Engine-RAG-source .venv/bin/activate
+
+```2) Install dependencies
+
+bash
+
+### 2. Install DependenciesCopy code
+
+pip install -r requirements.txt
+
+```bash3) Configure environment
+
+# Create and activate virtual environmentCreate .env in the project root (or copy from .env.example):
+
+python -m venv .venv
+
+env
+
+# WindowsCopy code
+
+.venv\Scripts\activateAPP_NAME="Knowledge RAG API"
 
 APP_ENV=dev
 
-HOST=0.0.0.0### 1. Clone and Navigate
+# Linux/MacHOST=0.0.0.0
 
-PORT=8000```bash
-
-GOOGLE_API_KEY=your_gemini_api_key_heregit clone <repository-url>
-
-GEMINI_MODEL=models/gemini-2.0-flashcd Assignment
-
-``````
+source .venv/bin/activatePORT=8000
 
 
 
-### 4. Start the Server### 2. Install Dependencies
+# Install packagesGOOGLE_API_KEY=your_gemini_api_key_here
 
-```bash```bash
+pip install -r requirements.txt# Pick a model your account supports; examples:
 
-uvicorn backend.app:app --host 127.0.0.1 --port 8000 --reloadpip install -r requirements.txt
+```GEMINI_MODEL=gemini-1.5-flash
 
-``````
+# alternatives: gemini-1.5-flash-001, gemini-1.5-flash-latest, gemini-1.5-pro
+
+### 3. Environment ConfigurationWindows copy example: Copy-Item .env.example .env
+
+Unix copy example: cp .env.example .env
+
+Create `.env` file from template:
+
+4) Run the API
+
+```bashbash
+
+cp .env.example .envCopy code
+
+```uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
+
+Open:
+
+Edit `.env` file:
+
+Tester UI: http://localhost:8000/
+
+```env
+
+APP_NAME="Knowledge RAG API"Health: http://localhost:8000/healthz
+
+APP_ENV=dev
+
+HOST=0.0.0.0🚀 Usage
+
+PORT=8000Web interface (recommended)
+
+Visit http://localhost:8000/
+
+# Get your API key from: https://makersuite.google.com/app/apikey
+
+GOOGLE_API_KEY=your_api_key_hereUpload a .pdf or .txt
 
 
 
-The API will be available at `http://localhost:8000`### 3. Environment Configuration
-
-Create or update `.env` file:
-
-## Usage```env
-
-APP_NAME="Knowledge RAG API"
-
-### Web Interface (Recommended for Testing)APP_ENV=dev
-
-1. Open `tester.html` in your browserHOST=0.0.0.0
-
-2. Upload a PDF or TXT filePORT=8000
-
-3. Ask questions about the document contentGOOGLE_API_KEY=your_gemini_api_key_here
-
-4. Get grounded, cited responsesGEMINI_MODEL=models/gemini-2.0-flash
-
+# Available models: models/gemini-2.0-flash, models/gemini-2.5-flash, models/gemini-2.5-proAsk a question (e.g., refund policy, password reset)
+GEMINI_MODEL=models/gemini-2.0-flash
 ```
-
-### API Endpoints
 
 ### 4. Start the Server
 
-#### Health Check```bash
-
-```bashuvicorn backend.app:app --host 127.0.0.1 --port 8000 --reload
-
-GET /healthz```
-
+```bash
+uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 The API will be available at `http://localhost:8000`
 
-#### Upload Document
+## Usage
 
-```bash## Usage
+### Web Interface (Recommended for Testing)
 
-POST /upload
-
-Content-Type: multipart/form-data### Web Interface (Recommended for Testing)
-
-File: document.pdf or document.txt1. Open `tester.html` in your browser
-
-```2. Upload a PDF or TXT file
-
+1. Open `tester.html` in your browser
+2. Upload a PDF or TXT file
 3. Ask questions about the document content
+4. Get concise, cited responses (1-4 sentences with [n] citations)
 
-Response:4. Get grounded, cited responses
+### API Endpoints
 
+#### Health Check
+
+```bash
+GET /healthz
+```
+
+Response:
 ```json
-
-{### API Endpoints
-
-  "session_id": "unique-session-id",
-
-  "message": "Document uploaded and indexed successfully",#### Health Check
-
-  "chunks": 15,```bash
-
-  "filename": "document.pdf"GET /healthz
-
-}```
-
+{
+  "ok": true,
+  "message": "healthy"
+}
 ```
 
 #### Upload Document
 
-#### Ask Question```bash
-
-```bashPOST /upload
-
-POST /askContent-Type: multipart/form-data
-
-Content-Type: application/jsonFile: document.pdf or document.txt
-
+```bash
+POST /upload
+Content-Type: multipart/form-data
+File: document.pdf or document.txt
 ```
 
-{
-
-  "session_id": "unique-session-id",Response:
-
-  "q": "What is the refund policy?",```json
-
-  "k": 6,{
-
-  "strict": true  "session_id": "unique-session-id",
-
-}  "message": "Document uploaded and indexed successfully",
-
-```  "chunks": 15,
-
-  "filename": "document.pdf"
-
-Response:}
-
-```json```
-
-{
-
-  "answer": "The company offers a 30-day return policy for all products [1]. Customers must provide a receipt for all returns [1].",#### Ask Question
-
-  "session_id": "unique-session-id",```bash
-
-  "question": "What is the refund policy?",POST /ask
-
-  "retrieved_blocks": ["Block content with citations..."],Content-Type: application/json
-
-  "method": "tfidf_gemini"
-
-}{
-
-```  "session_id": "unique-session-id",
-
-  "q": "What is the refund policy?",
-
-#### Debug Models (Development)  "k": 6,
-
-```bash  "strict": true
-
-GET /debug/models}
-
-``````
-
-
-
-### Query ExamplesResponse:
-
+Response:
 ```json
+{
+  "session_id": "unique-session-id",
+  "message": "Document uploaded and indexed successfully",
+  "chunks": 15,
+  "filename": "document.pdf"
+}
+```
 
-#### Specific Questions{
+#### Ask Question
 
-- "What is the refund policy?"  "answer": "The company offers a 30-day return policy for all products [1]. Customers must provide a receipt for all returns [1].",
+```bash
+POST /ask
+Content-Type: application/json
 
-- "How do I reset my password?"  "session_id": "unique-session-id",
+{
+  "session_id": "unique-session-id",
+  "q": "What is the refund policy?",
+  "k": 4,
+  "strict": true
+}
+```
 
-- "What are the business hours?"  "question": "What is the refund policy?",
-
-  "retrieved_blocks": ["Block content with citations..."],
-
-#### Summary Questions  "method": "tfidf_gemini"
-
-- "Provide a summary of the whole document"}
-
-- "What does this document contain?"```
-
-- "Give me an overview of the main topics"
+Response:
+```json
+{
+  "answer": "The company offers a 30-day money-back guarantee on all products [1]. To request a refund, customers must provide the original receipt [1]. Refunds are processed within 5-7 business days [1].",
+  "session_id": "unique-session-id",
+  "question": "What is the refund policy?",
+  "retrieved_blocks": [...],
+  "filename": "document.pdf"
+}
+```
 
 #### Debug Models (Development)
 
-#### Short/Fuzzy Queries```bash
+```bash
+GET /debug/models
+```
 
-- "refund" → Enhanced to "refund policy return"GET /debug/models
-
-- "pasword" → Corrected to "password"```
-
-- "hrs" → Expanded to "hours business"
+Lists available Gemini models.
 
 ### Query Examples
 
+#### Specific Questions
+- "What is the refund policy?"
+- "How do I reset my password?"
+- "What are the business hours?"
+
+#### Document Overview
+- "What is this document about?"
+- "Give me a summary of the document"
+
+#### Short/Fuzzy Queries
+- "refund" → Enhanced to "refund policy return"
+- "pasword" → Corrected to "password"
+- "hrs" → Expanded to "hours business"
+
 ## Testing
 
-#### Specific Questions
-
-### Testing the System- "What is the refund policy?"
-
-- "How do I reset my password?"
-
-#### Web Interface Testing (Recommended)- "What are the business hours?"
+### Web Interface Testing (Recommended)
 
 1. Open `tester.html` in your browser
-
-2. Upload a PDF or TXT document#### Summary Questions
-
-3. Test various question types:- "Provide a summary of the whole document"
-
-   - **Document Content**: "What does this document contain?"- "What does this document contain?"
-
-   - **Summaries**: "Provide a summary of the document"- "Give me an overview of the main topics"
-
+2. Upload a PDF or TXT document
+3. Test various question types:
    - **Specific Questions**: "What is the refund policy?"
+   - **Document Overview**: "What is this document about?"
+   - **How-to Questions**: "How do I reset my password?"
 
-   - **Main Topics**: "What are the key points?"#### Short/Fuzzy Queries
+### API Testing with curl
 
-- "refund" → Enhanced to "refund policy return"
-
-#### API Testing- "pasword" → Corrected to "password"
-
-Use curl or any HTTP client to test the endpoints:- "hrs" → Expanded to "hours business"
-
-
-
-```bash##  Testing
-
+```bash
 # Upload a document
+curl -X POST "http://localhost:8000/upload" -F "file=@your_document.pdf"
 
-curl -X POST "http://localhost:8000/upload" -F "file=@your_document.pdf"### Testing the System
-
-
-
-# Ask questions (use session_id from upload response)#### Web Interface Testing (Recommended)
-
-curl -X POST "http://localhost:8000/ask" \1. Open `tester.html` in your browser
-
-  -H "Content-Type: application/json" \2. Upload a PDF or TXT document
-
-  -d '{"session_id":"your-session-id","q":"What does this document contain?","strict":true}'3. Test various question types:
-
-```   - **Document Content**: "What does this document contain?"
-
-   - **Summaries**: "Provide a summary of the document"
-
-## Architecture   - **Specific Questions**: "What is the refund policy?"
-
-   - **Main Topics**: "What are the key points?"
-
-### RAG Pipeline
-
-1. **Document Processing**: #### API Testing
-
-   - PDF/TXT extraction using pypdfUse curl or any HTTP client to test the endpoints:
-
-   - Text chunking with overlap for context preservation
-
-   - TF-IDF vectorization with n-gram support (1-3 words)```bash
-
-# Upload a document
-
-2. **Query Processing**:curl -X POST "http://localhost:8000/upload" -F "file=@your_document.pdf"
-
-   - Fuzzy correction for typos using difflib
-
-   - Synonym expansion for short queries# Ask questions (use session_id from upload response)
-
-   - Dynamic parameter adjustment based on query lengthcurl -X POST "http://localhost:8000/ask" \
-
+# Ask questions (use session_id from upload response)
+curl -X POST "http://localhost:8000/ask" \
   -H "Content-Type: application/json" \
+  -d '{"session_id":"your-session-id","q":"What is the refund policy?","k":4,"strict":true}'
+```
 
-3. **Retrieval & Generation**:  -d '{"session_id":"your-session-id","q":"What does this document contain?","strict":true}'
-
-   - TF-IDF cosine similarity for relevant chunk retrieval```
-
-   - Google Gemini AI for natural language generation
-
-   - Strict grounding validation with citation requirements## Architecture
-
-   - Fallback to "I don't know" for out-of-scope queries
+## Architecture
 
 ### RAG Pipeline
 
-### Key Components1. **Document Processing**: 
-
+1. **Document Processing**:
    - PDF/TXT extraction using pypdf
+   - Text chunking with overlap for context preservation (220 words, 40 word overlap)
+   - TF-IDF vectorization with n-gram support (1-2 words)
 
-#### `backend/app.py` - Main Application   - Text chunking with overlap for context preservation
-
-- FastAPI server with CORS support   - TF-IDF vectorization with n-gram support (1-3 words)
-
-- Session-based document management
-
-- Dual RAG implementation (TF-IDF + FAISS)2. **Query Processing**:
-
-- Gemini integration with strict grounding   - Fuzzy correction for typos using difflib
-
-- Enhanced query processing (fuzzy, n-gram, synonyms)   - Synonym expansion for short queries
-
+2. **Query Processing**:
+   - Fuzzy correction for typos using difflib
+   - Synonym expansion for short queries
    - Dynamic parameter adjustment based on query length
 
-#### `backend/rag_pipeline.py` - Multi-Document RAG
-
-- FAISS vector store integration3. **Retrieval & Generation**:
-
-- Sentence transformer embeddings   - TF-IDF cosine similarity for relevant chunk retrieval
-
-- Advanced retrieval and reranking   - Google Gemini AI for natural language generation
-
+3. **Retrieval & Generation**:
+   - TF-IDF cosine similarity for relevant chunk retrieval (max 4 chunks)
+   - Limited context (4 blocks, 1600 characters)
+   - Google Gemini AI for natural language generation (160 tokens max)
    - Strict grounding validation with citation requirements
+   - Fallback to "I don't know" for out-of-scope queries
 
-#### Smart Query Enhancement   - Fallback to "I don't know" for out-of-scope queries
+### Key Components
 
-- **Fuzzy Correction**: Automatic typo detection and correction
-
-- **N-gram Processing**: 1-3 word phrase matching for better relevance### Key Components
-
-- **Synonym Expansion**: Enriches short queries with related terms
-
-- **Dynamic Parameters**: Adjusts TF-IDF settings based on query characteristics#### `backend/app.py` - Main Application
-
+#### `backend/app.py` - Main Application
 - FastAPI server with CORS support
+- Session-based document management
+- Single-document TF-IDF + Gemini implementation
+- Strict answer grounding with citation validation
+- Enhanced query processing (fuzzy, n-gram, synonyms)
 
-## Security & Configuration- Session-based document management
-
-- Dual RAG implementation (TF-IDF + FAISS)
-
-### Environment Variables- Gemini integration with strict grounding
-
-- `GOOGLE_API_KEY`: Required for Gemini AI integration- Enhanced query processing (fuzzy, n-gram, synonyms)
-
-- `GEMINI_MODEL`: Specify model version (default: models/gemini-2.0-flash)
-
-- `HOST`/`PORT`: Server configuration#### `backend/rag_pipeline.py` - Multi-Document RAG
-
+#### `backend/rag_pipeline.py` - Multi-Document RAG
 - FAISS vector store integration
+- Sentence transformer embeddings
+- Advanced retrieval and reranking
 
-### Data Privacy- Sentence transformer embeddings
+#### Answer Generation
+- **Max Context**: 4 blocks, 1600 characters
+- **Max Tokens**: 160 (ensures concise answers)
+- **Temperature**: 0.1 (consistent, deterministic)
+- **Citation Requirement**: Every sentence must have [n]
+- **Validation**: 30% token overlap + citations required
 
-- Session-based isolation prevents cross-document leakage- Advanced retrieval and reranking
-
-- Temporary storage with configurable cleanup
-
-- No persistent storage of sensitive content#### Smart Query Enhancement
-
-- **Fuzzy Correction**: Automatic typo detection and correction
-
-## Production Considerations- **N-gram Processing**: 1-3 word phrase matching for better relevance
-
-- **Synonym Expansion**: Enriches short queries with related terms
-
-### Scaling- **Dynamic Parameters**: Adjusts TF-IDF settings based on query characteristics
-
-- Consider Redis for session management in multi-instance deployments
-
-- Implement proper rate limiting for API endpoints## Security & Configuration
-
-- Add authentication and authorization layers
+## Security & Configuration
 
 ### Environment Variables
 
-### Monitoring- `GOOGLE_API_KEY`: Required for Gemini AI integration
-
-- Built-in health checks at `/healthz`- `GEMINI_MODEL`: Specify model version (default: models/gemini-2.0-flash)
-
-- Debug endpoints for development (`/debug/models`)- `HOST`/`PORT`: Server configuration
-
-- Comprehensive error handling with fallbacks
+- `GOOGLE_API_KEY`: Required for Gemini AI integration
+- `GEMINI_MODEL`: Specify model version (default: models/gemini-2.0-flash)
+- `HOST`/`PORT`: Server configuration
 
 ### Data Privacy
 
-### Performance- Session-based isolation prevents cross-document leakage
-
-- Efficient TF-IDF caching per session- Temporary storage with configurable cleanup
-
-- Optimized chunk retrieval with configurable top-k- No persistent storage of sensitive content
-
-- Streaming responses for large documents (future enhancement)
+- Session-based isolation prevents cross-document leakage
+- Temporary storage with configurable cleanup
+- No persistent storage of sensitive content
+- `.env` file excluded from git (in `.gitignore`)
 
 ## Production Considerations
 
-## Contributing
-
 ### Scaling
 
-1. Fork the repository- Consider Redis for session management in multi-instance deployments
+- Consider Redis for session management in multi-instance deployments
+- Implement proper rate limiting for API endpoints
+- Add authentication and authorization layers
 
-2. Create a feature branch- Implement proper rate limiting for API endpoints
-
-3. Add comprehensive tests for new features- Add authentication and authorization layers
-
-4. Ensure all existing tests pass
-
-5. Submit a pull request### Monitoring
+### Monitoring
 
 - Built-in health checks at `/healthz`
-
-## License- Debug endpoints for development (`/debug/models`)
-
+- Debug endpoints for development (`/debug/models`)
 - Comprehensive error handling with fallbacks
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ### Performance
 
-## Acknowledgments- Efficient TF-IDF caching per session
+- Efficient TF-IDF caching per session
+- Optimized chunk retrieval with configurable top-k (max 4)
+- Compact context for faster response times
 
-- Optimized chunk retrieval with configurable top-k
+## Key Improvements
 
-- Built with FastAPI for high-performance API development- Streaming responses for large documents (future enhancement)
+### Strict Grounding System
 
-- Powered by Google Gemini AI for natural language generation
+✅ **Concise Answers**: 1-4 sentences maximum  
+✅ **Required Citations**: Every sentence must include [n]  
+✅ **Limited Context**: 4 blocks, 1600 chars (prevents content dumps)  
+✅ **Token Limit**: 160 tokens (ensures brevity)  
+✅ **Validation**: Strict overlap checking + citation verification  
 
-- Uses scikit-learn for efficient text processing## Contributing
+### Before vs After
 
-- Enhanced with sentence-transformers for semantic search
+**Before:**
+```
+[Dumps 500+ characters of raw content without structure...]
+```
+
+**After:**
+```
+The company offers a 30-day money-back guarantee on all products [1]. 
+To request a refund, customers must provide the original receipt [1]. 
+Refunds are processed within 5-7 business days [1].
+```
+
+## Documentation
+
+Additional documentation available:
+
+- `QUICK_REFERENCE.md` - Quick setup and usage guide
+- `TEST_RESULTS.md` - Verified test results
+- `FINAL_FIX.md` - Technical details of improvements
+- `TESTING_GUIDE.md` - Comprehensive testing instructions
+
+## Contributing
 
 1. Fork the repository
-
----2. Create a feature branch
-
+2. Create a feature branch
 3. Add comprehensive tests for new features
-
-**Ready to get started?** Upload a document via `tester.html` and ask your first question!4. Ensure all existing tests pass
+4. Ensure all existing tests pass
 5. Submit a pull request
 
+## License
 
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
 
